@@ -23,6 +23,19 @@ const arrayArithmetic = (arr1, arr2) =>{
     }
 }
 
+// Helper function to parse strig to get x and y coordinates of a node
+const parseString = (inputString) =>{
+    const regex = /Node\((\d+),(\d+)\)/; // Regular expression to match the pattern
+    const match = inputString.match(regex); // Use match() to find the pattern
+    if (match) {
+        // Extract and convert the x and y values to ints
+        const x = parseInt(match[1]); 
+        const y = parseInt(match[2]); 
+        const coordinate = [x,y]
+        return coordinate
+    }
+}
+
 // Direction Vectors for our knight
 const moves = [
     [-2, +1],
@@ -37,16 +50,14 @@ const moves = [
 
 let xQueue = []
 let yQueue = []
-let counter = 0
-let execution_ounter = 0;
+
 const dfs = (newVisitedMat, currentSquare, targetSquare) => {
     // Note: Coordinates will be entered in the form [y,x] for newVisitedMat. Everything else will be of the form [x,y]
-    
+    const startNode = [...currentSquare]  // Will be used later for path construction
     let path = {}
+    // Visit nodes until queue is empty (all nodes have been visited) or final node is found
     while(xQueue.length > 0 && yQueue.length > 0 && (currentSquare[0] !== targetSquare[0] || currentSquare[1] !== targetSquare[1])){
         let validMoves = []
-        execution_ounter++
-
         // Make all possible moves
         for(let i=0; i<8; i++){
             let newMove = arrayArithmetic(currentSquare, moves[i])
@@ -55,58 +66,63 @@ const dfs = (newVisitedMat, currentSquare, targetSquare) => {
             // Check for valid move and if node has been visited
             if(y >=1 && y <=8 && x >=1 && x <= 8 && newVisitedMat[y][x] !== 1){
                 newVisitedMat[y][x] = 1
-                counter++
                 validMoves.push(newMove)
                 xQueue.push(x)
                 yQueue.push(y)
             }
         }
+        // Dequeue visited node
         let xComponent = xQueue.shift()
         let yComponent = yQueue.shift()
+        //Add last visited node as key and all the nodes we can reach from that node as values
         path[`Node(${xComponent},${yComponent})`] = validMoves
-
-        console.log(`Current Move: (${xComponent},${yComponent})`)
-        console.log("XQUEUE: " + xQueue)
-        console.log("YQUEUE: " + yQueue)
         currentSquare[0] = xQueue[0]
         currentSquare[1] = yQueue[0]
-        console.log("Next Move: " + currentSquare)
     }
-    console.log("YAY! We found the goal of: " + currentSquare)
-    console.log("PATH")
-    console.log(path)
     let xFinal = targetSquare[0]
     let yFinal = targetSquare[1]
-    //TODO: Find a way to see backtrack from final quare to start node
-    // TODO: Find a way to parse the key string to get x,y values
-    for(let key in path){
-        for(let i=0; i<path[key].length; i++){
-            // Searching to see which key the final move coordinates belong to so we can backtrack
-            if(path[key][i][0] === xFinal && path[key][i][1] === yFinal){
-                console.log("FOUND KEY:" + key)
 
-                // Parse Key to get coords
-                // Add coords to new path array
-                // set xF and yF to those parsed coords and repeat loop
-                // End loop once xF and yF are null (we reached start node)
-                // Return new path array
+    let newPath = [targetSquare]
+    // While we haven't reached start node, keep extracting parent nodes
+    while(xFinal !== startNode[0] || yFinal !== startNode[1]){
+        for(let key in path){
+            for(let i=0; i<path[key].length; i++){
+                // Searching to see which key the final move coordinates belong to so we can backtrack
+                if(path[key][i][0] === xFinal && path[key][i][1] === yFinal){
+                    // Parse key to get coordinates 
+                    let parentNode = parseString(key)
+                    newPath.push(parentNode)
+                    xFinal = parentNode[0]
+                    yFinal = parentNode[1]
+                    break;
+                }
             }
         }
     }
+    newPath.reverse()
+    return newPath
 }   
 
 const knightMove = (currentSquare, targetSquare) =>{
     let newVisitedMat = createVistiedAdjMat()
+    let startNode = [...currentSquare]
+
     // Push first move into queue 
     xQueue.push(currentSquare[0])
     yQueue.push(currentSquare[1])
+
     // Mark first node as visited
     newVisitedMat[currentSquare[1]][currentSquare[0]] = 1
-    console.log(newVisitedMat)
     const path = dfs(newVisitedMat, currentSquare, targetSquare)
+    
+    let pathString = ""
+    for(let i=0; i<path.length; i++){
+        pathString += `[${path[i]}],`
+    }
+    let newPathString = pathString.slice(0,-1)
+    console.log(`Knight Moves [${startNode}], [${targetSquare}] = [${newPathString}]`)
 }
 
-knightMove([1,1], [4,4])
-
-console.log(counter)
-console.log(execution_ounter)
+knightMove([1,1], [1,5])
+// knightMove([4,7], [8,8])
+ knightMove([4,4], [4,5])
