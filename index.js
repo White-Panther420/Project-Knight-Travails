@@ -48,7 +48,7 @@ const moves = [
     [-2, -1]
 ];  
 
-const dfs = (newVisitedMat, currentSquare, targetSquare) => {
+const bfs = (newVisitedMat, currentSquare, targetSquare) => {
     // Note: Coordinates will be entered in the form [y,x] for newVisitedMat. Everything else will be of the form [x,y]
     const startNode = [...currentSquare]  // Will be used later for path construction
     let path = {}
@@ -108,7 +108,7 @@ const knightMove = (currentSquare, targetSquare) =>{
 
     // Mark first node as visited
     newVisitedMat[currentSquare[1]][currentSquare[0]] = 1
-    const path = dfs(newVisitedMat, currentSquare, targetSquare)
+    const path = bfs(newVisitedMat, currentSquare, targetSquare)
     
     let pathString = ""
     for(let i=0; i<path.length; i++){
@@ -116,9 +116,10 @@ const knightMove = (currentSquare, targetSquare) =>{
     }
     let newPathString = pathString.slice(0,-1)
     console.log(`Knight Moves [${startNode}], [${targetSquare}] = [${newPathString}]`)
-    console.log(newVisitedMat)
 }
 
 knightMove([1,1], [1,5])
 knightMove([4,7], [8,8])
- knightMove([4,4], [4,5])
+knightMove([4,4], [4,5])
+knightMove([4,4], [4,4])
+knightMove([1,1], [8,8])
