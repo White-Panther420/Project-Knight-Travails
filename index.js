@@ -48,13 +48,12 @@ const moves = [
     [-2, -1]
 ];  
 
-let xQueue = []
-let yQueue = []
-
 const dfs = (newVisitedMat, currentSquare, targetSquare) => {
     // Note: Coordinates will be entered in the form [y,x] for newVisitedMat. Everything else will be of the form [x,y]
     const startNode = [...currentSquare]  // Will be used later for path construction
     let path = {}
+    let xQueue = [startNode[0]]
+    let yQueue = [startNode[1]] 
     // Visit nodes until queue is empty (all nodes have been visited) or final node is found
     while(xQueue.length > 0 && yQueue.length > 0 && (currentSquare[0] !== targetSquare[0] || currentSquare[1] !== targetSquare[1])){
         let validMoves = []
@@ -107,10 +106,6 @@ const knightMove = (currentSquare, targetSquare) =>{
     let newVisitedMat = createVistiedAdjMat()
     let startNode = [...currentSquare]
 
-    // Push first move into queue 
-    xQueue.push(currentSquare[0])
-    yQueue.push(currentSquare[1])
-
     // Mark first node as visited
     newVisitedMat[currentSquare[1]][currentSquare[0]] = 1
     const path = dfs(newVisitedMat, currentSquare, targetSquare)
@@ -121,8 +116,9 @@ const knightMove = (currentSquare, targetSquare) =>{
     }
     let newPathString = pathString.slice(0,-1)
     console.log(`Knight Moves [${startNode}], [${targetSquare}] = [${newPathString}]`)
+    console.log(newVisitedMat)
 }
 
 knightMove([1,1], [1,5])
-// knightMove([4,7], [8,8])
+knightMove([4,7], [8,8])
  knightMove([4,4], [4,5])
